@@ -31,7 +31,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 // Run all tests in the ./exo5 folder/package
-                sh 'mvn -Dtest=**/exo5/*Test test'
+                sh 'mvn -Dtest=**/*Test test'
             }
         }
 
