@@ -2,60 +2,57 @@ pipeline {
     agent any
 
     tools {
-        // Install the Maven version required
+        // Install the Maven version configured in Jenkins global tools configuration
         maven 'Maven 3.6.3'
-        // Install the JDK version required
-        jdk 'JDK 21'
-    }
-
-    environment {
-        // Set the Maven settings if required
-        MAVEN_OPTS = '-Xmx1024m'
+        jdk 'JDK 21' // Adjust to the appropriate JDK version if needed
     }
 
     stages {
         stage('Checkout') {
             steps {
-                // Checkout the source code from the repository
+                // Checkout the code from the GitHub repository
                 git url: 'https://github.com/Germain-L/exo8testunitaire.git', branch: 'main'
             }
         }
-
         stage('Build') {
             steps {
-                // Build the project using Maven
+                // Run the Maven build
                 sh 'mvn clean install'
             }
         }
-
-        stage('Run Tests') {
+        stage('Test') {
             steps {
-                // Run all tests in the ./exo5 folder/package
-                sh 'mvn -Dtest=**/*Test test'
+                // Run the Maven tests
+                sh 'mvn test'
+            }
+            post {
+                // Archive the test results
+                always {
+                    junit 'target/surefire-reports/*.xml'
+                }
             }
         }
-
-        stage('Archive Results') {
+        stage('Package') {
             steps {
-                // Archive the test results and build artifacts
-                junit '**/target/surefire-reports/*.xml'
-                archiveArtifacts artifacts: '**/target/*.jar', allowEmptyArchive: true
+                // Package the application
+                sh 'mvn package'
+            }
+            post {
+                // Archive the built artifact
+                always {
+                    archiveArtifacts artifacts: 'target/*.jar', allowEmptyArchive: true
+                }
             }
         }
     }
 
     post {
-        always {
-            // Clean up the workspace
-            cleanWs()
-        }
+        // Notify if the build was successful or failed
         success {
-            // Send notifications on success
-            echo 'Build and tests succeeded.'
+            echo 'Build and Tests Successful!'
         }
         failure {
-            // Send notifications on failure
-            echo 'Build or tests failed.'
+            echo 'Build or Tests Failed!'
         }
     }
 }
