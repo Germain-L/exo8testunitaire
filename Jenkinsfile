@@ -17,7 +17,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Checkout the source code from the repository
-                git url: 'https://your-repo-url.git', branch: 'main'
+                git url: 'https://github.com/Germain-L/exo8testunitaire.git', branch: 'main'
             }
         }
 
